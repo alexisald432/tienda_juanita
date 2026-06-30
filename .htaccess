@@ -1,0 +1,30 @@
+# ============================================
+# Protección de archivos sensibles y Config
+# Tienda Juanita — Preparado para Railway
+# ============================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Forzar HTTPS detrás del proxy de Railway usando X-Forwarded-Proto
+    # Esto evita el loop de redirecciones infinito (ERR_TOO_MANY_REDIRECTS)
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Bloquear acceso a archivos SQL (backups de BD)
+<FilesMatch "\.(sql|sql\.gz|sql\.bak)$">
+    Require all denied
+</FilesMatch>
+
+# Bloquear acceso directo a conexion.php
+<Files "conexion.php">
+    Require all denied
+</Files>
+
+# Desactivar listado de directorios
+Options -Indexes
+
+# Charset UTF-8 por defecto
+AddDefaultCharset UTF-8
